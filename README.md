@@ -9,7 +9,7 @@ An Android library, written in Kotlin, which helps avoid boilerplate code when y
 [ ![Download](https://api.bintray.com/packages/superjob/android/kotlin-permissions/images/download.svg) ](https://bintray.com/superjob/android/kotlin-permissions/_latestVersion)
 ```gradle
 dependencies {
-    com.github.abdulwahab1539:kotlin-permissions:v1.0.4'
+    implementation 'com.github.abdulwahab1539:kotlin-permissions:v1.0.4'
 }
 ```
 
