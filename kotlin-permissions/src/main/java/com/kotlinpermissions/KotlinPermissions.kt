@@ -3,10 +3,9 @@ package com.kotlinpermissions
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import java.lang.ref.WeakReference
-import java.util.*
 import java.util.concurrent.Semaphore
 
 object KotlinPermissions {
@@ -25,12 +24,24 @@ object KotlinPermissions {
         private var deniedCallback: WeakReference<ResponsePermissionCallback>? = null
         private var foreverDeniedCallback: WeakReference<ResponsePermissionCallback>? = null
         private val listener = object : PermissionFragment.PermissionListener {
-            override fun onRequestPermissionsResult(acceptedPermissions: List<String>, refusedPermissions: List<String>, askAgainPermissions: List<String>) {
-                onReceivedPermissionResult(acceptedPermissions, refusedPermissions, askAgainPermissions)
+            override fun onRequestPermissionsResult(
+                acceptedPermissions: List<String>,
+                refusedPermissions: List<String>,
+                askAgainPermissions: List<String>
+            ) {
+                onReceivedPermissionResult(
+                    acceptedPermissions,
+                    refusedPermissions,
+                    askAgainPermissions
+                )
             }
         }
 
-        internal fun onReceivedPermissionResult(acceptedPermissions: List<String>?, foreverDenied: List<String>?, denied: List<String>?) {
+        internal fun onReceivedPermissionResult(
+            acceptedPermissions: List<String>?,
+            foreverDenied: List<String>?,
+            denied: List<String>?
+        ) {
 
             acceptedPermissions.whenNotNullNorEmpty {
                 acceptedCallback?.get()?.onResult(it)
@@ -103,11 +114,13 @@ object KotlinPermissions {
 
                 //ne need < Android Marshmallow
                 if (permissions.isEmpty() || Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                        permissionAlreadyAccepted(activity, permissions)) {
+                    permissionAlreadyAccepted(activity, permissions)
+                ) {
                     onAcceptedPermission(permissions)
                     semaphore.release()
                 } else {
-                    val oldFragment = fragmentActivity.supportFragmentManager.findFragmentByTag(TAG) as PermissionFragment?
+                    val oldFragment =
+                        fragmentActivity.supportFragmentManager.findFragmentByTag(TAG) as PermissionFragment?
 
                     oldFragment.ifNotNullOrElse({
                         it.addPermissionForRequest(listener, permissions)
@@ -117,7 +130,8 @@ object KotlinPermissions {
                         newFragment.addPermissionForRequest(listener, permissions)
                         Try.withThreadIfFail({
                             fragmentActivity.runOnUiThread {
-                                fragmentActivity.supportFragmentManager.beginTransaction().add(newFragment, TAG).commitNowAllowingStateLoss()
+                                fragmentActivity.supportFragmentManager.beginTransaction()
+                                    .add(newFragment, TAG).commitNowAllowingStateLoss()
                                 semaphore.release()
                             }
                         }, 3)
@@ -132,7 +146,10 @@ object KotlinPermissions {
             onReceivedPermissionResult(permissions, null, null)
         }
 
-        private fun permissionAlreadyAccepted(context: Context, permissions: List<String>): Boolean {
+        private fun permissionAlreadyAccepted(
+            context: Context,
+            permissions: List<String>
+        ): Boolean {
             for (permission in permissions) {
                 val permissionState = ContextCompat.checkSelfPermission(context, permission)
                 if (permissionState == PackageManager.PERMISSION_DENIED) {

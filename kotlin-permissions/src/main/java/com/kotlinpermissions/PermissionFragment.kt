@@ -1,9 +1,8 @@
 package com.kotlinpermissions
 
 import android.content.pm.PackageManager
-import android.support.v4.app.Fragment
 import android.util.Log
-import java.util.*
+import androidx.fragment.app.Fragment
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
@@ -43,7 +42,11 @@ class PermissionFragment : Fragment() {
         requestPermissions(perms, REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == REQUEST_CODE && permissions.isNotEmpty() && grantResults.isNotEmpty()) {
 
             val acceptedPermissions = ArrayList<String>()
@@ -63,14 +66,19 @@ class PermissionFragment : Fragment() {
                 }
             }
 
-            listener?.onRequestPermissionsResult(acceptedPermissions, refusedPermissions, askAgainPermissions)
+            listener?.onRequestPermissionsResult(
+                acceptedPermissions,
+                refusedPermissions,
+                askAgainPermissions
+            )
         }
         waitingForReceive = false
     }
 
     private fun removeFragment() {
         try {
-            fragmentManager?.beginTransaction()?.remove(this@PermissionFragment)?.commitAllowingStateLoss()
+            fragmentManager?.beginTransaction()?.remove(this@PermissionFragment)
+                ?.commitAllowingStateLoss()
         } catch (e: Exception) {
             Log.w(TAG, "Error while removing fragment")
         }
@@ -81,12 +89,17 @@ class PermissionFragment : Fragment() {
     }
 
     internal interface PermissionListener {
-        fun onRequestPermissionsResult(acceptedPermissions: List<String>, refusedPermissions: List<String>, askAgainPermissions: List<String>)
+        fun onRequestPermissionsResult(
+            acceptedPermissions: List<String>,
+            refusedPermissions: List<String>,
+            askAgainPermissions: List<String>
+        )
     }
 
     private data class PermissionHolder(
-            val permissions: List<String>,
-            val listener: PermissionListener)
+        val permissions: List<String>,
+        val listener: PermissionListener
+    )
 
     companion object {
         private const val REQUEST_CODE = 23000
